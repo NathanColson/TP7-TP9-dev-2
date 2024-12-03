@@ -1,208 +1,322 @@
-from math import gcd
-
-
 class Fraction:
-    """
-    Class representing a fraction and operations on it.
+    """Class representing a fraction and operations on it
 
-    Author: V. Van den Schrieck
-    Date: October 2021
-    Updated: November 2024
+    Author : V. Van den Schrieck
+    Date : October 2021
     This class allows fraction manipulations through several operations.
     """
 
-    def __init__(self, num=0, den=1):
-        """
-        Initialize a fraction with a numerator and a denominator.
+    def __init__(self, num: int=0, den: int=1):
+        """This builds a fraction based on some numerator and denominator.
 
-        PRE: The denominator must not be zero.
-        POST: Stores the fraction in reduced form (numerator and denominator
-              divided by their greatest common divisor).
-        EXCEPTIONS: Raises ZeroDivisionError if the denominator is 0.
+        PRE : Aucun préalable.
+        POST : Les attributs `numerator` et `denominator` sont stockés sous leur forme la plus réduite.
+        L'utilisation des accesseurs garantit la gestion des erreurs.
         """
-        if den == 0:
-            raise ZeroDivisionError("Le dénominateur ne peut pas être égal à 0.")
-
-        commun = gcd(num, den)
-        self._num = num // commun
-        self._den = abs(den // commun)
-        if den < 0:
-            self._num = -self._num
+        self._num = None
+        self._den = None
+        self.numerator = num
+        self.denominator = den
 
     @property
     def numerator(self):
-        """Returns the numerator of the fraction."""
         return self._num
 
     @property
     def denominator(self):
-        """Returns the denominator of the fraction."""
         return self._den
 
-    # ------------------ Textual representations ------------------
-
-    def __str__(self):
+    @numerator.setter
+    def numerator(self, num: int):
         """
-        Return a string representation of the fraction.
-
-        POST: Returns the numerator if the denominator is 1; otherwise,
-              returns 'numerator/denominator'.
+        PRE : Aucun préalable.
+        POST : Définit la variable interne `_num`. Réduit la fraction si possible.
+        RAISES :  une exception si le type est incorrect.
         """
-        if self.denominator == 1:
-            return str(self.numerator)
-        return f"{self.numerator}/{self.denominator}"
+        if not isinstance(num, int):
+            raise TypeError("Le numerator n'est pas un int")
+        self._num = num
+        if isinstance(self._den, int):
+            self.reduce_form()
 
-    def as_mixed_number(self):
+    @denominator.setter
+    def denominator(self, den):
         """
-        Return the fraction as a mixed number (integer + proper fraction).
-
-        POST: Returns the integer part if no remainder exists;
-              otherwise, returns 'integer remainder/denominator'.
+        PRE : aucun préalable.
+        POST : Définit la variable interne `_den`. Réduit la fraction si possible.
+        RAISES : Si le type n'est pas correct. ValueError if den == 0
         """
-        entier = self.numerator // self.denominator
-        reste = abs(self.numerator % self.denominator)
+        if not isinstance(den, int):
+            raise TypeError("Le dénominateur d'une fraction doit être un entier")
+        if not den:
+            raise ValueError("Le dénominateur d'une fraction ne peut pas être 0")
+        self._den = den
+        if isinstance(self._num, int):
+            self.reduce_form()
 
-        if reste == 0:
-            return str(entier)
-        return f"{entier} {reste}/{self.denominator}"
+    def gcd(self, n: int, d: int):
+        """
+        Uses Euclid's algorithm to compute the GCD used to reduce the fraction form
+        PRE : Les deux paramètres doivent être des entiers
+        POST : Returns de GCD
+        RAISES : TypeError if either argument is not an int
+        """
+        if not (isinstance(n, int) and isinstance(d, int)):
+            raise TypeError("Les deux paramètres de la méthode gcd() doivent être des entiers")
+        while d != 0:
+            n, d = d, n % d
+        return abs(n)
 
-    # ------------------ Operators overloading ------------------
+    def reduce_form(self):
+        """
+        Réduit la fraction à sa forme la plus simple.
+         """
+        d = self.gcd(self._num, self._den)
+        self._num //= d
+        self._den //= d
+        if self._den < 0:
+            self._num *= -1
+            self._den *= -1
+
+# ------------------ Textual representations ------------------
+
+    def __str__(self) :
+        """Return a textual representation of the reduced form of the fraction
+
+        PRE : Aucun préalable.
+        POST : Retourne une chaîne représentant la fraction sous forme réduite
+        """
+        den = ""
+        if self._num % self._den:
+            den = f"/{self._den}"
+        return f"{self._num}" + den
+
+    def as_mixed_number(self) :
+        """Return a textual representation of the reduced form of the fraction as a mixed number
+        A mixed number is the sum of an integer and a proper fraction
+
+        PRE :  Aucun préalable.
+        POST : Retourne une chaîne représentant la fraction comme une somme d'un entier et d'une fraction propre
+        """
+        rest = ""
+        if self._num % self._den:
+            rest = f" and {self._num % self._den}/{self._den}"
+        return f"{self._num // self._den}" + rest
+
+# ------------------ Operators overloading ------------------
 
     def __add__(self, other):
-        """
-        Overload the + operator to add two fractions.
+        """Overloading of the + operator for fractions
 
-        POST: Returns a new Fraction as the sum of the two fractions.
-        EXCEPTIONS: Raises TypeError if 'other' is not a Fraction.
-        """
-        if not isinstance(other, Fraction):
-            raise TypeError("L'opérande doit être une fraction.")
-        num = (self.numerator * other.denominator) + (self.denominator * other.numerator)
-        den = self.denominator * other.denominator
-        return Fraction(num, den)
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne une nouvelle instance de Fraction représentant la somme de `self` et `other`.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
+         """
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            num = (self._num * other._den) + (other._num * self._den)
+            den = self._den * other._den
+            return Fraction(num, den)
+        raise TypeError("Votre Fraction n'est pas du bon type")
 
     def __sub__(self, other):
-        """
-        Overload the - operator to subtract two fractions.
+        """Overloading of the - operator for fractions
 
-        POST: Returns a new Fraction as the difference between the two fractions.
-        EXCEPTIONS: Raises TypeError if 'other' is not a Fraction.
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne une nouvelle instance de Fraction représentant la différence entre `self` et `other`.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
         """
-        if not isinstance(other, Fraction):
-            raise TypeError("L'opérande doit être une fraction.")
-        num = (self.numerator * other.denominator) - (self.denominator * other.numerator)
-        den = self.denominator * other.denominator
-        return Fraction(num, den)
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            num = (self._num * other._den) - (other._num * self._den)
+            den = self._den * other._den
+            return Fraction(num, den)
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
     def __mul__(self, other):
-        """
-        Overload the * operator to multiply two fractions.
+        """Overloading of the * operator for fractions
 
-        POST: Returns a new Fraction as the product of the two fractions.
-        EXCEPTIONS: Raises TypeError if 'other' is not a Fraction.
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne une nouvelle instance de Fraction représentant le produit de `self` et `other`.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
         """
-        if not isinstance(other, Fraction):
-            raise TypeError("L'opérande doit être une fraction.")
-        num = self.numerator * other.numerator
-        den = self.denominator * other.denominator
-        return Fraction(num, den)
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            num = self._num * other._num
+            den = self._den * other._den
+            return Fraction(num, den)
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
     def __truediv__(self, other):
-        """
-        Overload the / operator to divide two fractions.
+        """Overloading of the / operator for fractions
 
-        POST: Returns a new Fraction as the quotient of the two fractions.
-        EXCEPTIONS: Raises TypeError if 'other' is not a Fraction.
-                    Raises ZeroDivisionError if 'other.numerator' is 0.
+        PRE : `other` doit être un entier ou une instance de Fraction. `other` ne doit pas représenter 0.
+        POST : Retourne une nouvelle instance de Fraction représentant le quotient de `self` et `other`.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction. ValueError si `other` représente 0.
         """
-        if not isinstance(other, Fraction):
-            raise TypeError("L'opérande doit être une fraction.")
-        if other.numerator == 0:
-            raise ZeroDivisionError("Division par une fraction avec un numérateur égal à 0.")
-        num = self.numerator * other.denominator
-        den = self.denominator * other.numerator
-        return Fraction(num, den)
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            if not other._num:
+                raise ValueError("Pas de division par 0")
+            num = self._num * other._den
+            den = self._den * other._num
+            return Fraction(num, den)
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
-    def __pow__(self, power):
+    def __pow__(self, other):
         """Overloading of the ** operator for fractions
 
-        PRE : faire un exposant avec une fraction
-        POST : mets d'exposant à la fraction
+        PRE : `other` doit être un entier ou une Fraction représentant un entier.
+        POST : Retourne une nouvelle instance de Fraction représentant `self` élevé à la puissance `other`.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction représentant un entier.
         """
-        num = self.numerator ** power
-        den = self.denominator ** power
-        return Fraction(num, den)
+        if isinstance(other, Fraction) and (not (other._num % other._den)):
+            # other is a Fraction representing an integer
+            other = int(other._num / other._den)
+        if isinstance(other, int):
+            if other >= 0:
+                num = self._num ** other
+                den = self._den ** other
+            else:
+                num = self._den ** -other
+                den = self._num ** -other
+            return Fraction(num, den)
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
-    def __eq__(self, other):
+    def __eq__(self, other) :
+        """Overloading of the == operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si `self` et `other` représentent la même valeur, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
         """
-        Overload the == operator to compare two fractions.
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return (self._num == other._num) and (self._den == other._den)
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
-        POST: Returns True if the two fractions are equal; otherwise False.
+    def __float__(self) :
+        """Returns the decimal value of the fraction
+
+         PRE : Aucun préalable.
+        POST : Retourne la valeur décimale de la fraction.
         """
-        if not isinstance(other, Fraction):
-            return False
-        return self.numerator == other.numerator and self.denominator == other.denominator
+        return self._num / self._den
 
-    def __float__(self):
+    def __ne__(self, other):
+        """Overloading of the != operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne False si `self` et `other` représentent la même valeur, sinon True.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction
         """
-        Return the decimal value of the fraction.
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return not ((self._num == other._num) and (self._den == other._den))
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
-        POST: Returns the fraction's decimal equivalent.
+    def __gt__(self, other):
+        """Overloading of the > operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si `self` représente une valeur supérieure à `other`, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
         """
-        return self.numerator / self.denominator
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return self._num * other._den > other._num * self._den
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
-    # ------------------ Properties checking ------------------
+    def __ge__(self, other):
+        """Overloading of the >= operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si `self` est supérieur ou égal à `other`, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
+        """
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return self._num * other._den >= other._num * self._den
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
+
+    def __lt__(self, other):
+        """Overloading of the < operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si `self` représente une valeur inférieure à `other`, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
+        """
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return self._num * other._den < other._num * self._den
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
+
+    def __le__(self, other):
+        """Overloading of the <= operator for fractions
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si `self` est inférieur ou égal à `other`, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
+        """
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return self._num * other._den <= other._num * self._den
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
+
+# ------------------ Properties checking  ------------------
 
     def is_zero(self):
-        """
-        Check if the fraction equals zero.
+        """Check if a fraction's value is 0
 
-        POST: Returns True if the fraction is zero; otherwise False.
+        PRE : Aucun préalable.
+        POST : Retourne True si la valeur de la fraction est 0, sinon False.
         """
-        return self.numerator == 0
+        return self._num == 0
+
 
     def is_integer(self):
-        """
-        Check if the fraction is an integer.
+        """Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
 
-        POST: Returns True if the fraction's numerator is a multiple of its denominator; otherwise False.
+        PRE : Aucun préalable.
+        POST : Retourne True si la fraction représente un entier.
         """
-        return self.numerator % self.denominator == 0
+        return self._den == 1 # Works because of the auto reduced form
 
     def is_proper(self):
-        """
-        Check if the fraction is proper (absolute value < 1).
+        """Check if the absolute value of the fraction is < 1
 
-        POST: Returns True if proper; otherwise False.
+        PRE : Aucun préalable.
+        POST : Retourne True si la fraction représente une valeur absolue inférieure à 1
         """
-        return abs(self.numerator) < self.denominator
+        return float(self) < 1
 
     def is_unit(self):
+        """Check if a fraction's numerator is 1 in its reduced form
+
+        PRE : Aucun préalable.
+        POST : Retourne True si la fraction est égale à 1.
         """
-        Check if the fraction is a unit fraction (numerator = 1).
+        return self._num == self._den # == 1 because of the auto reduced form
 
-        POST: Returns True if unit fraction; otherwise False.
+    def is_adjacent_to(self, other) :
+        """Check if two fractions differ by a unit fraction
+
+        PRE : `other` doit être un entier ou une instance de Fraction.
+        POST : Retourne True si la différence absolue entre les deux fractions est une fraction unitaire, sinon False.
+        RAISES : TypeError si `other` n'est pas un entier ou une Fraction.
         """
-        return abs(self.numerator) == 1
-
-    def is_adjacent_to(self, other):
-        """
-        Check if two fractions differ by a unit fraction.
-
-        PRE: 'other' must be an instance of Fraction.
-        POST: Returns True if adjacent; otherwise False.
-        EXCEPTIONS: Raises TypeError if 'other' is not a Fraction.
-        """
-        if not isinstance(other, Fraction):
-            raise TypeError("L'opérande doit être une fraction.")
-        diff_num = abs(self.numerator * other.denominator - self.denominator * other.numerator)
-        diff_den = self.denominator * other.denominator
-        return diff_num == 1
-
-
-if __name__ == "__main__":
-    # Example usage
-    f1 = Fraction(1, 2)
-    f2 = Fraction(3, 4)
-    print(f1 + f2)
-    print(f1.as_mixed_number())
+        if isinstance(other, int):
+            other = Fraction(other, 1)
+        if isinstance(other, Fraction):
+            return abs((self - other)._num) == 1
+        raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
