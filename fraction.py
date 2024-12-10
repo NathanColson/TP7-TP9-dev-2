@@ -9,12 +9,19 @@ class Fraction:
     """
 
     def __init__(self, num: int = 0, den: int = 1):
-        """Build a fraction based on some numerator and denominator.
-
-        PRE : Le dénominateur doit être non nul.
-        POST : Les attributs `__num` et `__den` sont stockés sous leur forme la plus réduite.
-        RAISES : ValueError si le dénominateur est nul, TypeError si les arguments ne sont pas des entiers.
         """
+            Initialisation d'une fraction.
+
+            PRE :
+                - Le dénominateur doit être un entier non nul.
+                - Les deux arguments doivent être des entiers.
+            POST :
+                - La fraction est réduite à sa forme irréductible.
+                - Les attributs `__num` et `__den` contiennent respectivement le numérateur et le dénominateur réduits.
+            RAISES :
+                - ValueError si le dénominateur est nul.
+                - TypeError si les arguments ne sont pas des entiers.
+            """
         if not isinstance(num, int) or not isinstance(den, int):
             raise TypeError("Les deux arguments doivent être des entiers.")
         if den == 0:
@@ -77,18 +84,15 @@ class Fraction:
 
     def __add__(self, other):
         """
-            Ajoute une fraction ou un entier à la fraction courante.
+            Additionne une fraction ou un entier avec la fraction courante.
 
-            Pré:
-            - L'objet doit être une instance de la classe Fraction.
-            - L'argument 'other' doit être soit un entier, soit une autre instance de la classe Fraction.
-
-            Post:
-            - Si 'other' est un entier, la méthode retourne une nouvelle instance de Fraction avec l'entier converti en fraction (l'entier devient le numérateur, et le dénominateur est 1).
-            - Si 'other' est une instance de Fraction, la méthode retourne une nouvelle instance de Fraction représentant la somme des deux fractions, avec un numérateur et un dénominateur réduits.
-
-            Raise:
-            - Lève une exception de type TypeError si 'other' n'est ni un entier ni une instance de Fraction.
+            PRE :
+                - `other` doit être un entier ou une instance de la classe Fraction.
+                  Si ce n'est pas le cas, une exception est levée.
+            POST :
+                - Retourne une nouvelle fraction représentant la somme, réduite à sa forme irréductible.
+            RAISES :
+                - TypeError si `other` n'est ni un entier ni une instance de Fraction.
             """
         if isinstance(other, int):
             other = Fraction(other, 1)
@@ -202,26 +206,29 @@ class Fraction:
         raise TypeError("Vous ne pouvez utiliser cette méthode seulement avec un entier ou une Fraction")
 
     def __float__(self):
-        """Returns the decimal value of the fraction
-
-        PRE : None
-        POST : returns the decimal value of the fraction
         """
+        Returns the decimal value of the fraction
+
+        PRE : Aucun prérequis particulier.
+        POST : Returns the decimal value of the fraction.
+                """
         return self.__num / self.__den
 
     def is_zero(self):
-        """Check if a fraction's value is 0
+        """
+        Check if a fraction's value is 0
 
-        PRE : None
-        POST : returns True if the Fraction is equal to 0, False if not
+        PRE : Aucun prérequis particulier.
+        POST : Returns True if the Fraction is equal to 0, False if not.
         """
         return self.__num == 0
 
     def is_integer(self):
-        """Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
+        """
+        Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
 
-        PRE : None
-        POST : returns True if the Fraction represents an integer
+        PRE : Aucun prérequis particulier.
+        POST : Returns True if the Fraction represents an integer.
         """
         return self.__den == 1  # Works because of the auto reduced form
 
@@ -244,13 +251,19 @@ class Fraction:
         return self.__num == self.__den
 
     def is_adjacent_to(self, other):
-        """Check if two fractions differ by a unit fraction
+        """
+        Check if two fractions differ by a unit fraction
 
-        Two fractions are adjacents if the absolute value of the difference between them is a unit fraction
+        Two fractions are adjacents if the absolute value of the difference between them is a unit fraction.
 
-        PRE : None
-        POST : returns True if the two values differ by a unit fraction, False if not
-        RAISES : TypeError if other is not an instance of int or Fraction
+        PRE :
+         - L'objet peut être de n'importe quel type.
+
+        POST :
+        - Returns True if the two values differ by a unit fraction, False if not.
+
+        RAISES :
+        - TypeError if other is not an instance of int or Fraction.
         """
         if isinstance(other, int):
             other = Fraction(other, 1)
