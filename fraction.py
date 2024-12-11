@@ -12,9 +12,7 @@ class Fraction:
         """
             Initialisation d'une fraction.
 
-            PRE :
-                - Le dénominateur doit être un entier non nul.
-                - Les deux arguments doivent être des entiers.
+            PRE : None
             POST :
                 - La fraction est réduite à sa forme irréductible.
                 - Les attributs `__num` et `__den` contiennent respectivement le numérateur et le dénominateur réduits.
@@ -72,7 +70,7 @@ class Fraction:
 
         A mixed number is the sum of an integer and a proper fraction
 
-        PRE : -
+        PRE : None
         POST : Renvoie un entier et sa fraction restante
         """
         temp = ""
@@ -86,9 +84,7 @@ class Fraction:
         """
             Additionne une fraction ou un entier avec la fraction courante.
 
-            PRE :
-                - `other` doit être un entier ou une instance de la classe Fraction.
-                  Si ce n'est pas le cas, une exception est levée.
+            PRE : None
             POST :
                 - Retourne une nouvelle fraction représentant la somme, réduite à sa forme irréductible.
             RAISES :
@@ -106,10 +102,7 @@ class Fraction:
         """
             Soustrait une fraction ou un entier de la fraction courante.
 
-            Préconditions:
-            - L'objet doit être une instance de la classe Fraction.
-            - L'argument 'other' doit être soit un entier, soit une autre instance de la classe Fraction.
-
+            Préconditions: None
             Postconditions:
             - Si 'other' est un entier, la méthode retourne une nouvelle instance de Fraction avec l'entier converti en fraction (l'entier devient le numérateur, et le dénominateur est 1).
             - Si 'other' est une instance de Fraction, la méthode retourne une nouvelle instance de Fraction représentant la différence des deux fractions, avec un numérateur et un dénominateur réduits.
@@ -129,10 +122,7 @@ class Fraction:
         """
             Multiplie une fraction ou un entier avec la fraction courante.
 
-            Préconditions:
-            - L'objet doit être une instance de la classe Fraction.
-            - L'argument 'other' doit être soit un entier, soit une autre instance de la classe Fraction.
-
+            Préconditions: None
             Postconditions:
             - Si 'other' est un entier, la méthode retourne une nouvelle instance de Fraction avec l'entier converti en fraction (l'entier devient le numérateur, et le dénominateur est 1).
             - Si 'other' est une instance de Fraction, la méthode retourne une nouvelle instance de Fraction représentant le produit des deux fractions, avec un numérateur et un dénominateur réduits.
@@ -152,10 +142,7 @@ class Fraction:
         """
             Divise la fraction courante par une fraction ou un entier.
 
-            Préconditions:
-            - L'objet doit être une instance de la classe Fraction.
-            - L'argument 'other' doit être soit un entier, soit une autre instance de la classe Fraction.
-
+            Préconditions: None
             Postconditions:
             - Si 'other' est un entier, la méthode retourne une nouvelle instance de Fraction avec l'entier converti en fraction (l'entier devient le numérateur, et le dénominateur est 1).
             - Si 'other' est une instance de Fraction, la méthode retourne une nouvelle instance de Fraction représentant le quotient des deux fractions, avec un numérateur et un dénominateur réduits.
@@ -177,7 +164,7 @@ class Fraction:
     def __pow__(self, other: int):
         """Overloading of the ** operator for fractions
 
-        PRE : -
+        PRE : None
         POST : Renvoie un objet qui est la puissance other de notre object
         """
         new_num = self.__num ** other
@@ -188,10 +175,7 @@ class Fraction:
         """
             Vérifie si la fraction courante est égale à une autre fraction ou un entier.
 
-            Préconditions:
-            - L'objet doit être une instance de la classe Fraction.
-            - L'argument 'other' doit être soit un entier, soit une autre instance de la classe Fraction.
-
+            Préconditions: None
             Postconditions:
             - Retourne True si les fractions (ou la fraction et l'entier) sont égales, c'est-à-dire si leurs numérateurs et dénominateurs sont identiques.
             - Retourne False sinon.
@@ -209,7 +193,7 @@ class Fraction:
         """
         Returns the decimal value of the fraction
 
-        PRE : Aucun prérequis particulier.
+        PRE : None
         POST : Returns the decimal value of the fraction.
                 """
         return self.__num / self.__den
@@ -218,7 +202,7 @@ class Fraction:
         """
         Check if a fraction's value is 0
 
-        PRE : Aucun prérequis particulier.
+        PRE : None
         POST : Returns True if the Fraction is equal to 0, False if not.
         """
         return self.__num == 0
@@ -227,7 +211,7 @@ class Fraction:
         """
         Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
 
-        PRE : Aucun prérequis particulier.
+        PRE : None
         POST : Returns True if the Fraction represents an integer.
         """
         return self.__den == 1  # Works because of the auto reduced form
@@ -235,7 +219,7 @@ class Fraction:
     def is_proper(self):
         """Check if the absolute value of the fraction is < 1
 
-        PRE : -
+        PRE : None
         POST : Renvoie True si la Fraction est égale à une valeur strictement en dessous de 1
         """
         output = abs(self.__num) / abs(self.__den) < 1
@@ -256,9 +240,7 @@ class Fraction:
 
         Two fractions are adjacents if the absolute value of the difference between them is a unit fraction.
 
-        PRE :
-         - L'objet peut être de n'importe quel type.
-
+        PRE : None
         POST :
         - Returns True if the two values differ by a unit fraction, False if not.
 

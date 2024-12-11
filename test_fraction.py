@@ -22,6 +22,20 @@ class FractionTestCase(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             Fraction(3, 0)
+        with self.assertRaises(TypeError):
+            Fraction(3.5, 2)  # Numérateur non entier
+        with self.assertRaises(TypeError):
+            Fraction(3, "2")  # Dénominateur non entier
+        with self.assertRaises(TypeError):
+            Fraction("3", "2")  # Numérateur et dénominateur non entiers
+        with self.assertRaises(TypeError):
+            Fraction(None, 2)  # Numérateur None
+        with self.assertRaises(TypeError):
+            Fraction(3, None)  # Dénominateur None
+        with self.assertRaises(TypeError):
+            Fraction([], 2)  # Numérateur liste
+        with self.assertRaises(TypeError):
+            Fraction(3, {})  # Dénominateur dictionnaire
 
     def test_string(self):
         frac1 = Fraction(34, 58)
@@ -90,31 +104,78 @@ class FractionTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             frac1 + "4"  # Une chaîne de caractères, pas un entier ou une Fraction
 
-    def test_mul(self):
+    def test_sub(self):
+        # Soustraction entre fractions
         frac1 = Fraction(3, 4)
-        frac2 = Fraction(0, 5)
-        frac3 = Fraction(2, 5)
-        frac4 = Fraction(-2, 5)
+        frac2 = Fraction(1, 4)
+        result = frac1 - frac2
+        self.assertEqual(result.__str__(), "1/2")  # Réduction
 
-        # Test division par une fraction nulle
-        with self.assertRaises(ValueError):
-            frac1 / frac2  # Division par zéro (numérateur de `frac2` est 0)
+        # Soustraction avec un entier
+        frac3 = Fraction(5, 6)
+        result = frac3 - 1
+        self.assertEqual(result.numerator, -1)  # 5 - 6 = -1
+        self.assertEqual(result.denominator, 6)  # 6 * 1
 
-        # Test division par un type invalide
+        # Soustraction avec un entier négatif
+        result = frac3 - (-1)
+        self.assertEqual(result.numerator, 11)  # 5 + 6 = 11
+        self.assertEqual(result.denominator, 6)  # 6 * 1
+
+        # Soustraction avec zéro
+        frac4 = Fraction(1, 3)
+        result = frac4 - 0
+        self.assertEqual(result.numerator, 1)
+        self.assertEqual(result.denominator, 3)
+
+        # Soustraction avec des types invalides
         with self.assertRaises(TypeError):
-            frac1 / "2"  # Une chaîne de caractères, pas un entier ou une fraction
+            frac1 - "invalid"  # Chaîne de caractères
+        with self.assertRaises(TypeError):
+            frac1 - 2.5  # Float
+        with self.assertRaises(TypeError):
+            frac1 - None  # None
 
-        # Cas valides
-        result1 = frac1 / frac3
-        self.assertEqual(result1.numerator, 15)
-        self.assertEqual(result1.denominator, 8)
+    def test_mul(self):
+        # Multiplication de fractions
+        frac1 = Fraction(2, 3)
+        frac2 = Fraction(3, 4)
+        result = frac1 * frac2
+        self.assertEqual(result.__str__(), "1/2")  # Réduction
 
-        result2 = frac1 / frac4
-        self.assertEqual(result2.numerator, -15)
-        self.assertEqual(result2.denominator, 8)
+        # Multiplication avec un entier
+        frac3 = Fraction(1, 4)
+        result = frac3 * 2
+        self.assertEqual(result.__str__(), "1/2")  # Réduction
 
-        with self.assertRaises(ValueError):
-            frac1 / frac2  # `frac2` a un numérateur de 0
+        # Multiplication avec une fraction négative
+        frac4 = Fraction(-1, 2)
+        frac5 = Fraction(3, 5)
+        result = frac4 * frac5
+        self.assertEqual(result.numerator, -3)  # -1 * 3
+        self.assertEqual(result.denominator, 10)  # 2 * 5
+
+        # Multiplication avec un entier négatif
+        result = frac5 * -2
+        self.assertEqual(result.numerator, -6)  # 3 * -2
+        self.assertEqual(result.denominator, 5)  # 5 * 1
+
+        # Multiplication avec zéro
+        frac6 = Fraction(0, 1)
+        result = frac6 * frac2
+        self.assertEqual(result.numerator, 0)
+        self.assertEqual(result.denominator, 1)
+        result = frac1 * 0
+        self.assertEqual(result.numerator, 0)
+        self.assertEqual(result.denominator, 1)
+
+        # Multiplication avec des types invalides
+        with self.assertRaises(TypeError):
+            frac1 * "invalid"  # Chaîne de caractères
+        with self.assertRaises(TypeError):
+            frac1 * 2.5  # Float
+        with self.assertRaises(TypeError):
+            frac1 * None  # None
 
     def test_truediv(self):
         """"Verifying the overloaded / operator"""
