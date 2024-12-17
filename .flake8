@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 100       # Limite la longueur des lignes à 100 caractères (par défaut 79)
+exclude = 
+    __pycache__,            # Exclut les dossiers __pycache__
+    venv,                   # Exclut les environnements virtuels
+    .git,                   # Exclut les dossiers Git
+    *.egg-info
+ignore = 
+    E203,                   # Ignore certaines erreurs spécifiques (ex: E203 pour les espaces)
+    W503                    # Ignore l'avertissement W503 (ligne avant opérateur)
+
